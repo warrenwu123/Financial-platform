@@ -1,26 +1,30 @@
 # ── Build stage ────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Pin to -jammy (Ubuntu 22.04 based) for stability. Avoid floating :8.0 tag
+# which can pick up a corrupted cached layer on first pull.
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
 WORKDIR /app
 
+# Restore dependencies first (layer-cached separately from source)
 COPY src/TerminalPro.API/TerminalPro.API.csproj ./src/TerminalPro.API/
 RUN dotnet restore ./src/TerminalPro.API/TerminalPro.API.csproj
 
+# Copy source and publish
 COPY src/TerminalPro.API/ ./src/TerminalPro.API/
 RUN dotnet publish ./src/TerminalPro.API/TerminalPro.API.csproj \
     -c Release -o /publish --no-restore
 
 # ── Runtime stage ──────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy AS runtime
 WORKDIR /app
 
-# Non-root user for security
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-USER appuser
+# Non-root user — use adduser syntax correct for Debian/Ubuntu based images
+RUN groupadd --system appgroup \
+ && useradd  --system --gid appgroup --no-create-home appuser
 
 COPY --from=build /publish .
 
+USER appuser
 ENV ASPNETCORE_URLS=http://+:5000
 ENV ASPNETCORE_ENVIRONMENT=Production
-
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "TerminalPro.API.dll"]

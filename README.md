@@ -108,7 +108,7 @@ cp .env.example .env
 ### 4a. Run with Docker (recommended)
 
 ```bash
-docker-compose up --build
+docker-compose build --no-cache && docker-compose up
 ```
 
 | Service | URL |

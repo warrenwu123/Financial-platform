@@ -1,7 +1,5 @@
-version: "3.9"
-
-# Development overrides — mounts source for hot reload
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# docker-compose.dev.yml — Development overrides (hot reload)
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 services:
 
@@ -9,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-      target: build          # stop at SDK stage so we can use dotnet watch
+      target: build
     volumes:
       - ./src/TerminalPro.API:/app/src/TerminalPro.API
     environment:
@@ -34,6 +32,4 @@ services:
   scraper:
     volumes:
       - ./src/TerminalPro.Scraper:/app
-    environment:
-      - RELOAD=true
     command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload

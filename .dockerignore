@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# .NET build artifacts
+src/TerminalPro.API/bin
+src/TerminalPro.API/obj
+
+# Frontend build artifacts
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# Python
+src/TerminalPro.Scraper/__pycache__
+src/TerminalPro.Scraper/*.pyc
+src/TerminalPro.Scraper/.venv
+
+# Environment / secrets
+.env
+*.env.local
+
+# IDE
+.vs
+.vscode
+*.user
+
+# OS
+.DS_Store
+Thumbs.db

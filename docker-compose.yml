@@ -1,4 +1,5 @@
-version: "3.9"
+# docker-compose.yml — Production
+# Note: 'version' field removed (obsolete in Compose V2, causes warning)
 
 services:
 
@@ -14,12 +15,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
-      - Finnhub__ApiKey=${FINNHUB_API_KEY}
-      - Fmp__ApiKey=${FMP_API_KEY}
-      - Anthropic__ApiKey=${ANTHROPIC_API_KEY}
+      - Finnhub__ApiKey=${FINNHUB_API_KEY:-}
+      - Fmp__ApiKey=${FMP_API_KEY:-}
+      - Anthropic__ApiKey=${ANTHROPIC_API_KEY:-}
       - ScraperService__Url=http://scraper:8001
     depends_on:
-      - scraper
+      scraper:
+        condition: service_healthy
     networks:
       - terminalpro
     healthcheck:
@@ -27,9 +29,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 30s
 
-  # ── React Frontend (Vite → Nginx) ────────────────────────────────────────────
+  # ── React Frontend (Nginx) ──────────────────────────────────────────────────
   frontend:
     build:
       context: .
@@ -39,11 +41,12 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     networks:
       - terminalpro
 
-  # ── Python News Scraper ──────────────────────────────────────────────────────
+  # ── Python News Scraper ─────────────────────────────────────────────────────
   scraper:
     build:
       context: .
@@ -53,16 +56,16 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - FINNHUB_API_KEY=${FINNHUB_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY:-}
     networks:
       - terminalpro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
 
 networks:
   terminalpro:
