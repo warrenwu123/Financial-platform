@@ -1,6 +1,8 @@
-# scraper/requirements.txt
-scrapling[playwright]>=0.2.9
+# TerminalPro Scraper dependencies
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 anthropic>=0.40.0
 aiohttp>=3.11.0
+playwright>=1.49.0
+# scrapling for enhanced scraping (install after playwright)
+scrapling>=0.2.9
