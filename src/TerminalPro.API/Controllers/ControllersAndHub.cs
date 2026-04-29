@@ -197,7 +197,7 @@ namespace TerminalPro.API.Services
                     var price = Math.Round(last + tick, 2);
                     _lastPrices[sym] = price;
 
-                    var update = new TickUpdate(sym, price, tick, Math.Round(tick / last * 100, 3));
+                    var update = new TickUpdate(sym, price, tick, (double)Math.Round(tick / last * 100, 3));
                     try
                     {
                         await _hub.Clients.Group(sym).SendAsync("Tick", update, ct);
